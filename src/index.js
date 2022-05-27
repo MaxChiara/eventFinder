@@ -1,14 +1,8 @@
-import './style/index.scss'
+import './style/index.scss';
+import App from './components/App';
+import * as ReactDOM from 'react-dom/client';
 
-const jim = {
-    blood: 100,
-    will: 20
-}
 
-const jim2 = {
-    ...jim,
-    cash: 50,
-    will: 10
-}
 
-console.log(jim2)
+const root = ReactDOM.createRoot(document.querySelector(".fl"));
+root.render( < App / > );

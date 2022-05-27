@@ -13,7 +13,7 @@ module.exports = {
     plugins: [new MiniCssExtractPlugin()],
     module: {
         rules: [{
-                test: /\.js$/,
+                test: /\.jsx?$/,
                 exclude: /node_modules/,
                 use: 'babel-loader'
             },
@@ -29,5 +29,11 @@ module.exports = {
         },
         hot: true
     },
-    devtool: "source-map"
+    devtool: "source-map",
+    resolve: {
+        alias: {
+            react: path.resolve('./node_modules/react'),
+        },
+        extensions: ['.jsx', '...'],
+    }
 }

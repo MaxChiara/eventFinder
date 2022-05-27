@@ -8,7 +8,8 @@ module.exports = {
     entry: "./src/index.js",
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'main.js'
+        filename: 'main.js',
+        assetModuleFilename: 'images/[hash][ext][query]'
     },
     plugins: [new MiniCssExtractPlugin()],
     module: {
@@ -20,7 +21,15 @@ module.exports = {
             {
                 test: /\.(s[ac]|c)ss$/i,
                 use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']
-            }
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg|webp)$/i,
+                type: 'asset'
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
+            },
         ]
     },
     devServer: {
@@ -31,9 +40,6 @@ module.exports = {
     },
     devtool: "source-map",
     resolve: {
-        alias: {
-            react: path.resolve('./node_modules/react'),
-        },
         extensions: ['.jsx', '...'],
     }
 }

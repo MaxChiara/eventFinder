@@ -1,30 +1,32 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef } from 'react';
 import Map from './Map';
 import Cards from './Cards';
 import Geohash from 'latlon-geohash';
 import mockData from './mockData'; //TESTING!!
 
-const DataVizContainer = ({formData}) => {
+export const PopupContext = React.createContext({
+  status: false,
+  toggleClosePopups: () => {},
+  popupVenueId: [],
+  sendVenueId : () => {},
+});
+
+const DataVizContainer = ({formData, sendCoords, getCoord, coord}) => {
   const [apiData, setApiData] = useState();
-  const [coord, setCoord] = useState([51.505, -0.09]);
+  const firstRender = useRef(true);
+  const [status, setStatus] = useState(false);
+  const toggleClosePopups= () => setStatus(!status);
+  const [popupVenueId, setPopupVenueId] = useState([]);
+  const sendVenueId = (venueid) => setPopupVenueId(venueid); 
+  
 
-  function getCoord(coordinates){
-    setCoord(coordinates)
-  }
-  //console.log("Render di DataVizContainer.jsx");
-  //console.log("GeoHash: " + Geohash.encode(coord[0], coord[1], 6));
+  
 
-/*
-tempData = {
-  eventCount:x,
-  venues: [
-    {
-      venueName: string,
-      ...
-    },
-  ]
-}
-*/
+  // function getCoord(coordinates){
+  //   setCoord(coordinates);
+  //   sendCoords(coord)
+  // }
+
   let tempData = {
     eventCount : 0, //TESTING,
     venues: [],
@@ -51,19 +53,26 @@ tempData = {
       let eventNotFound = true;
 
       tempData.venues.forEach((venue) => {
+        // gli eventi con orario 23:59 ho notato che sono eventi con ingressi a intervalli regolari (es. parte ogni 15 min). Quindi sostituisco localTime con 'continuous'
+        // if (events[i].dates.start.localTime == '23:59:00'){
+        //   events[i].dates.start.localTime = 'Continuous'
+        // }
         // vedo se tra venues c'è gia un oggetto con questa venueName
         if (venue.venueName === venueName){
           venueNotFound = false;
           // se c'è vedo se c'è anche già un evento con lo stesso nome, 
           venue.events.forEach((event) => {
             // Se c'è già vuol dire che si tratta dello stesso evento in un orario diverso, 
-            // quindi aggiungo solo l'orario nell'array degli orari
+            // quindi aggiungo solo l'orario nell'array degli orari.
+            // A volte per qualche motivo ci sono eventi con lo stesso identico orario e luogo (doppioni?), quindi lo aggiungo solo se non c'è già.
             if (event.name === events[i].name){
-              event.time.push(events[i].dates.start.localTime);
+              if (!event.time.includes(events[i].dates.start.localTime)){
+                    event.time.push(events[i].dates.start.localTime);
+              }
               eventNotFound = false
             }
           })
-            // se no aggiungo tutto l'evento
+            // se no si tratta di 2 eventi distinti nella stessa venue, quindi aggiungo tutto l'evento
             if (eventNotFound) {
               venue.events.push({
                 name: events[i].name,
@@ -73,6 +82,11 @@ tempData = {
                 images: events[i].images,
                 url: events[i].url,
                 venue: venueName,
+                venueId: events[i]['_embedded'].venues[0].id,
+                latlng: {
+                  lat: events[i]['_embedded'].venues[0].location.latitude,
+                  lng: events[i]['_embedded'].venues[0].location.longitude,
+                },
               })
             }
         }
@@ -98,7 +112,12 @@ tempData = {
               id: events[i].id,
               images: events[i].images,
               url: events[i].url,
-              venue: venueName //so che l'ho già salvato prima ma ho fatto male i conti e mi serve anche qua 
+              venue: venueName, //so che l'ho già salvato prima ma ho fatto male i conti e mi serve anche qua 
+              venueId: events[i]['_embedded'].venues[0].id,
+              latlng: {
+                lat: events[i]['_embedded'].venues[0].location.latitude,
+                lng: events[i]['_embedded'].venues[0].location.longitude,
+              },
             }
           ],
         })
@@ -113,12 +132,11 @@ tempData = {
   }
 
   function makeApiCall(page){
-    fetch(`https://app.ticketmaster.com/discovery/v2/events.json?apikey=7PWNTJ7kfnp2jP69LB5jPCMyct4ZOHaY&geoPoint=${Geohash.encode(coord[0], coord[1], 6)}&radius=${Math.ceil(formData.radius/1000)}&unit=km&localStartEndDateTime=${[formData.date, formData.endDate]}&sort=distance,asc&page=${page}&size=100`)
+    fetch(`https://app.ticketmaster.com/discovery/v2/events.json?apikey=7PWNTJ7kfnp2jP69LB5jPCMyct4ZOHaY&geoPoint=${Geohash.encode(coord[0], coord[1], 8)}&radius=${Math.ceil(formData.radius/1000)}&unit=km&localStartEndDateTime=${[formData.date, formData.endDate]}&sort=distance,asc&page=${page}&size=100`)
     .then(response => response.json())
     .then(data => {
       console.log('Raw api data: ', data);
       manipulateData(data);
-      //console.log(tempData);
       setApiData(tempData)
     })
     .catch(err => console.log("Errore con la chiamata API: " + err));
@@ -127,15 +145,22 @@ tempData = {
   const fetchCount = useRef(0)
 
   useEffect(()=> {
+    if(firstRender.current){
+      firstRender.current = false;
+      return
+    }
     makeApiCall(0);
     fetchCount.current += 1;
     console.log('Fetch count: ' + fetchCount.current);
   },[coord,formData])
 
+ 
   return (
     <>
-        <Map radius={formData.radius} getCoord={getCoord} coord={coord} data={apiData} />
-        <Cards data={apiData}/>
+      <PopupContext.Provider value = {{status, toggleClosePopups, popupVenueId, sendVenueId}}>
+        <Map radius={formData.radius} getCoord={getCoord} coord={coord} data={apiData} firstRender={firstRender.current} />
+        {(coord.length > 1) && <Cards data={apiData} />}
+      </PopupContext.Provider>  
     </>
   )
 }

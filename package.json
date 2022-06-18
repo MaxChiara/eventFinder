@@ -27,12 +27,15 @@
         "webpack-dev-server": "^4.9.0"
     },
     "dependencies": {
+        "@date-io/date-fns": "^2.14.0",
         "@emotion/react": "^11.9.0",
         "@emotion/styled": "^11.8.1",
         "@mui/icons-material": "^5.8.3",
         "@mui/material": "^5.8.2",
         "@mui/styled-engine-sc": "^5.8.0",
+        "@mui/x-date-pickers": "^5.0.0-alpha.6",
         "cross-env": "^7.0.3",
+        "date-fns": "^2.28.0",
         "formik": "^2.2.9",
         "gsap": "^3.10.4",
         "latlon-geohash": "^2.0.0",

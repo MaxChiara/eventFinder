@@ -8,16 +8,14 @@ const Cards = ({data}) => {
     if(data){
       const events = data.venues.reduce((prev, current) => [...prev, ...current.events] , []);
       return events.map((event) => {
-        //console.log(event);
-        return (<MediaCard data={event} key={event.id} /> )
-        
+        return (<MediaCard data={event} key={event.id}  /> )
       })
       }
     }
   ;
 
   return (
-    <div className='flex flex-wrap'>
+    <div className='flex flex-wrap justify-left'>
       {renderCards(data)}
     </div>
   )

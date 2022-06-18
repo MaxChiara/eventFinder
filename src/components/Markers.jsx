@@ -1,24 +1,81 @@
-import { Marker, Popup } from 'react-leaflet';
+import { MapContainer, Marker, Popup } from 'react-leaflet';
 import EvenuePopup from './EvenuePopup';
+import {useRef, useEffect, useState, useContext} from 'react';
+import {PopupContext} from './DataVizContainer';
+import { useMap } from 'react-leaflet/hooks';
+import  'leaflet';
+import { gsap } from "gsap";
+
+
 
 const Markers = ({data}) => {
+  const {status, toggleClosePopups, popupVenueId } = useContext(PopupContext);
+  const markerRef = useRef();
+  const map = useMap();
+  const flyToZoom = 16;
+  
+  map.invalidateSize({debounceMoveend: true});
 
-
-
+  function setRef(popupVenueId, venueId){
+    if (!popupVenueId){return null}
+    if (venueId == popupVenueId){
+      return markerRef
+    }
+    else {return null}
+  }
+  
   function renderMarkers(data){
+    // metto in tempCoordArray le coordinate di ogni marker che aggiungo.
+    // Prima di metterne uno nuovo controllo se le coordinate ci sono già.
+    // Se ci sono vuol dire che 2 venues diverse hanno le stesse identiche coordinate, che non capisco come possa essere possibile ma tant'è.
+    // A questo punto sfaso un attimo le coordinate che sto per inserire per fare in modo che i marker non si sovrapponino completamente. 
+    let tempCoordArray = [];
+    console.log('qua')
     return(
-    data.venues.map((venue) => {
-      return (
-        <Marker  position={[venue.latlng.lat, venue.latlng.lng]} key={venue.id} >
+      data.venues.map((venue) => {  
+          if (tempCoordArray.includes(`${venue.latlng.lat},${venue.latlng.lng}`)){
+          venue.latlng.lat = (+venue.latlng.lat + 0.00005); 
+          venue.latlng.lng = (+venue.latlng.lng + 0.00005); 
+          
+        }
+        else {tempCoordArray.push(`${venue.latlng.lat},${venue.latlng.lng}`)}
+      return (  
+        <Marker  position={[venue.latlng.lat, venue.latlng.lng]} key={venue.id} alt={venue.id} ref={setRef(popupVenueId, venue.id)} >
           <Popup >
-            <EvenuePopup events={venue.events} name={venue.venueName} />
+           <EvenuePopup events={venue.events} name={venue.venueName} distance={venue.distance} />
+           {/* <EvenuePopup events={venue.events} name={venue.venueName} /> */}
           </Popup>
-        </Marker>
-      )
+        </Marker> 
+     )
     }))
   }
 
-  //console.log(data)
+
+  useEffect(() => {
+    if(status){
+      map.stop();
+      const coordinates = markerRef.current.getLatLng();
+      map.closePopup();
+      map.flyTo([coordinates.lat, coordinates.lng], flyToZoom, {duration: 0.6, easeLinearity: 1});
+      setTimeout(function(){ 
+        gsap.from(`#${popupVenueId}`, {y:-100,duration:0.6, ease: "bounce.out"});
+      }, 600);
+      setTimeout(function(){ 
+        markerRef.current.openPopup();
+      }, 900);
+      toggleClosePopups();
+    }
+  },[popupVenueId])
+
+ useEffect(() =>{
+  document.querySelectorAll('img.leaflet-marker-icon').forEach((element) => {
+    if (!element.id){
+      element.id = element.alt;
+      element.alt = 'map venue marker'
+    }
+  })
+ })
+
   return (
     <>
       {data == undefined ? '' : renderMarkers(data)}

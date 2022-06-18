@@ -23,14 +23,18 @@ function EventHeader({event, styleProp, onNameClick}){
             {event.genre == "Undefined" ? "" : event.genre}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
+            Schedule:&nbsp;
             {event.time.map((time, index) => {
                 if (time) {
-                    return (
-                        <span key={index}>{time.slice(0, -3) + (index == event.time.length - 1  ? "" : " / ")}</span>
+                    //time =  time == 'Continuous' ? 'Continuous' : time.slice(0, -3);
+                    time = time == '23:59:00' ? 'Continuous' : time.slice(0, -3);
+                    return (     
+                            <span  key={index}>{time + (index == event.time.length - 1  ? "" : " / ")}</span>
                     )
                 }
             })}
-        </Typography>
+        </Typography>    
+        
     </div>
   )}
 

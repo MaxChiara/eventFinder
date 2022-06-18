@@ -3,7 +3,8 @@
 -valore default orario
 -form validation
 -Material UI per form
--aggiungere distance in venue popup
+-X (+ o -) eventi con stesse coordinate ma diverse venues 
+-toggle per useLocalTimeZone
 
 Manipolazione dati chiamata API:
 raggruppare stesso evento con orari diversi in un array -> card con 1 evento con orari diversi 
@@ -54,7 +55,7 @@ tempData:
                     ____Map____                     Cards                                
                     /    |     \                      |                            
                    /     |      \                     |                           
-        CircleWrapper  Markers   LocationMarker     MediaCard                      
+        CircleWrapper  Markers   LocationMarker    MediaCard                      
             |            |        (get coords)                    
           Circle         |                                             
                        (Marker)                                         

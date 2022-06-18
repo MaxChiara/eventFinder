@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useContext} from 'react';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -10,10 +10,12 @@ import Collapse from '@mui/material/Collapse';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import EventHeader from './EventHeader';
+import {PopupContext} from './DataVizContainer';
+
 
 export default function MediaCard({data}) {
   const [expanded, setExpanded] = useState(false);
-
+  const { toggleClosePopups, sendVenueId} = useContext(PopupContext);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -49,9 +51,16 @@ export default function MediaCard({data}) {
     }),
   }));
 
+  function gotoMarker(id){
+    toggleClosePopups();
+    sendVenueId(id);
+    document.querySelector(`#map`).scrollIntoView(false, {
+      behavior: 'smooth'
+    });
+  }
 
   return (
-    <Card sx={{ maxWidth: 302 }} id={data.id} >
+    <Card sx={{ maxWidth: 302 }} id={`card-${data.id}`} >
       <CardMedia
         component="img"
         height="140"
@@ -70,8 +79,8 @@ export default function MediaCard({data}) {
       </CardContent>
       
       <CardActions>
-        {/* <Button size="small" onClick={(e) => {console.log(e)}}>Share</Button>
-        <Button size="small" onClick={(e) => {console.log(e)}}>Learn More</Button> */}
+        <Button size="small" data-venueid={data.venueId} onClick={(e) => {gotoMarker(e.target.dataset.venueid)}}>Show on map</Button>
+        <Button size="small" onClick={(e) => {console.log(e)}}><a href={data.url} target='_blank' >Buy Tickets</a></Button>
       <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}

@@ -2,12 +2,15 @@ import React from 'react';
 import {useRef, useState, useEffect, useLayoutEffect} from  'react';
 import { Circle } from 'react-leaflet';
 
-const CircleWrapper = ({coord, radius}) => {
+const CircleWrapper = ({coord, radius, firstRender}) => {
   const [radiusTarget, setRadiusTarget] = useState(0);
   const previousCoord = useRef(coord);
 
 
   useEffect(() =>{
+    if (firstRender){
+      return
+    }
     const interval = setInterval(() =>{
         if (radiusTarget < radius) {
             setRadiusTarget((previous) => previous + 5)
@@ -17,7 +20,7 @@ const CircleWrapper = ({coord, radius}) => {
           }
   }, 1);
   return () => clearInterval(interval)
-  }, [radiusTarget, radius])
+  }, [radiusTarget, radius, firstRender])
  
   useLayoutEffect(() =>{
     setRadiusTarget(0)

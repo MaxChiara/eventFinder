@@ -25,10 +25,6 @@ function EvenuePopup({events, name, distance}) {
       }, 50);
     }
 
-    function reset(){
-      document.removeEventListener('scroll', () => scrollingListener(id));
-    }
-
     function onNameClick(id){
       cardId = id;
       document.querySelector(`#card-${id}`).scrollIntoView({
@@ -39,13 +35,13 @@ function EvenuePopup({events, name, distance}) {
 
     const card = (
       <React.Fragment>
-        <CardContent sx={{padding: 1}} >
-          <Typography sx={{ fontSize: 14, margin: 1}} color="text.secondary" gutterBottom>
+        <CardContent sx={{padding: 1}} className='pb-2' >
+          <Typography sx={{ fontSize: 14}} color="text.secondary" gutterBottom className='mt-0 mb-1' >
             {name}
           </Typography>
           {events.map((event) => <EventHeader event={event} onNameClick={() => onNameClick(event.id)} key={event.id} /> )}
         
-          <Typography sx={{ fontSize: 12}} color="text.secondary" >
+          <Typography sx={{ fontSize: 12, pb: 0}} color="text.secondary" >
             {'Distance: ' + distance + ' km'}
           </Typography>
         </CardContent>  

@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef } from 'react';
 import Map from './Map';
 import Cards from './Cards';
 import Geohash from 'latlon-geohash';
-import mockData from './mockData'; //TESTING!!
+import {apiKeyTm } from '../apikeys';
 
 export const PopupContext = React.createContext({
   status: false,
@@ -15,7 +15,7 @@ const DataVizContainer = ({formData, sendCoords, getCoord, coord}) => {
   const [apiData, setApiData] = useState();
   const firstRender = useRef(true);
   const [status, setStatus] = useState(false);
-  const toggleClosePopups= () => setStatus(!status);
+  const toggleClosePopups= () => setStatus((prev) => !prev);
   const [popupVenueId, setPopupVenueId] = useState([]);
   const sendVenueId = (venueid) => setPopupVenueId(venueid); 
   
@@ -132,7 +132,7 @@ const DataVizContainer = ({formData, sendCoords, getCoord, coord}) => {
   }
 
   function makeApiCall(page){
-    fetch(`https://app.ticketmaster.com/discovery/v2/events.json?apikey=7PWNTJ7kfnp2jP69LB5jPCMyct4ZOHaY&geoPoint=${Geohash.encode(coord[0], coord[1], 8)}&radius=${Math.ceil(formData.radius/1000)}&unit=km&localStartEndDateTime=${[formData.date, formData.endDate]}&sort=distance,asc&page=${page}&size=100`)
+    fetch(`https://app.ticketmaster.com/discovery/v2/events.json?apikey=${apiKeyTm}&geoPoint=${Geohash.encode(coord[0], coord[1], 8)}&radius=${Math.ceil(formData.radius/1000)}&unit=km&localStartEndDateTime=${[formData.date, formData.endDate]}&sort=distance,asc&page=${page}&size=100`)
     .then(response => response.json())
     .then(data => {
       console.log('Raw api data: ', data);

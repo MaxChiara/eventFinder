@@ -7,9 +7,14 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { useRef } from 'react';
+import LocalTime from './LocalTime';
 
 const SearchForm =  ({getInput, formData, coord}) => {   
-  
+  let isMobile = false;
+      if (/Mobi|Android/i.test(navigator.userAgent)) {
+        isMobile = true;
+      }
       const formik =  useFormik({
         initialValues: {
           radius: formData.radius,
@@ -25,7 +30,6 @@ const SearchForm =  ({getInput, formData, coord}) => {
       });
       function validate(values){
         const errors = {};
-      
         if (values.radius % 5 != 0) {
           errors.radius = 'Must be a multiple of 5';
         } 
@@ -33,35 +37,23 @@ const SearchForm =  ({getInput, formData, coord}) => {
       };
 
       console.log('RENDERING SearchForm');
+      function adjustRadius(radius){
+        const resto = radius % 5;
+        if(!resto){ return radius}
+        let value;
+        if (resto > 3){
+           value = radius + (5 - resto)
+        }
+        else {
+           value = radius - resto;
+        }
+        return value
+      }
 
-  return (
-    <div className='container'>
-      <Box
-      component="form"
-      sx={{
-        '& > :not(style)': { m: 1 },
-        display: 'flex'
-      }}
-      noValidate
-      autoComplete="off"
-      onSubmit={formik.handleSubmit}
-      >
-        <div>
-        <TextField
-          type="number"
-          name='radius'
-          id="radius" 
-          label="radius" 
-          value={formik.values.radius} 
-          onChange={formik.handleChange} 
-          inputProps={{
-            step: 5
-          }}
-          variant="outlined" />
-          {formik.errors.radius && <div>{formik.errors.radius}</div>}
-        </div>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DesktopDatePicker
+      function renderDatePicker(){
+        if (isMobile){
+          return(
+            <MobileDatePicker
             label="date"
             inputFormat="yyyy/MM/dd/"
             id="date"
@@ -71,60 +63,93 @@ const SearchForm =  ({getInput, formData, coord}) => {
             // onChange={formik.handleChange} 
             onChange={(value) => {
               value = new Date(value).toISOString().slice(0, 19);
-              console.log(formik)
+              console.log(formik);
               formik.setFieldValue('date', value);
-              //formik.handleChange({event:{target: {value: value, name: 'date', type: 'date'}}})
+              formik.handleSubmit();
           }}
             renderInput={(params) => <TextField {...params} />}
           />
+          )
+        }
+        else {
+          return (
+            <DesktopDatePicker
+            label="date"
+            inputFormat="yyyy/MM/dd/"
+            id="date"
+            name='date'
+            type="date"
+            value={formik.values.date} 
+            // onChange={formik.handleChange} 
+            onChange={(value) => {
+              value = new Date(value).toISOString().slice(0, 19);
+              console.log(formik);
+              formik.setFieldValue('date', value);
+              formik.handleSubmit();
+          }}
+            renderInput={(params) => <TextField {...params} />}
+          />
+          )
+        }
+      }
+
+  return (
+    <div className='container'>
+      <Box
+      component="form"
+      sx={{
+        '& > :not(style)': { m: 1 },
+        display: 'flex',
+        flexWrap: 'wrap'
+      }}
+      noValidate
+      autoComplete="off"
+      onSubmit={formik.handleSubmit}
+      >
+        <div>
+        <TextField
+          sx={{minWidth: 168}}
+          type="number"
+          name='radius'
+          id="radius" 
+          label="radius" 
+          value={formik.values.radius} 
+          onChange={(e) => {formik.handleChange(e)}} 
+          onBlur = {(e) => {
+            if (formik.errors.radius){
+              formik.setFieldValue('radius', adjustRadius(parseInt(e.target.value)))
+            }
+          }}
+          inputProps={{
+            step: 5
+          }}
+          variant="outlined" />
+          {formik.errors.radius && <div>{formik.errors.radius}</div>}
+        </div>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          {renderDatePicker()}
+          {/* <DesktopDatePicker
+            label="date"
+            inputFormat="yyyy/MM/dd/"
+            id="date"
+            name='date'
+            type="date"
+            value={formik.values.date} 
+            // onChange={formik.handleChange} 
+            onChange={(value) => {
+              value = new Date(value).toISOString().slice(0, 19);
+              console.log(formik);
+              formik.setFieldValue('date', value);
+              formik.handleSubmit();
+          }}
+            renderInput={(params) => <TextField {...params} />}
+          /> */}
         </LocalizationProvider>
         <Button type="submit" sx={{width: 2}} >Apply</Button>
       </Box>
-      {/* <form onSubmit={formik.handleSubmit}>
-        <input 
-          type="number" 
-          id="radius" 
-          name='radius'
-          value={formik.values.radius} 
-          onChange={formik.handleChange} 
-          className='border'  
-          step={5}/>
-        <label htmlFor="radius" className='mr-8'>Radius</label>
-        <input 
-          type="datetime-local" 
-          id="date" 
-          name='date'
-          value={formik.values.date} 
-          onChange={formik.handleChange} 
-          className='border'/>
-        <label htmlFor="date" className='mr-8'>Date</label>
-        <input type='submit' value="Submit" className='border'></input>
-      </form> */}
+      <LocalTime coord={coord} />
     </div>
   )
 }
 
 export default SearchForm
-
-{/* <div className='container'>
-      <form onSubmit={formik.handleSubmit}>
-        <input 
-          type="number" 
-          id="radius" 
-          name='radius'
-          value={formik.values.radius} 
-          onChange={formik.handleChange} 
-          className='border'  
-          step={5}/>
-        <label htmlFor="radius" className='mr-8'>Radius</label>
-        <input 
-          type="datetime-local" 
-          id="date" 
-          name='date'
-          value={formik.values.date} 
-          onChange={formik.handleChange} 
-          className='border'/>
-        <label htmlFor="date" className='mr-8'>Date</label>
-        <input type='submit' value="Submit" className='border'></input>
-      </form>
-    </div> */}

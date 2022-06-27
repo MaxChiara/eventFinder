@@ -15,7 +15,7 @@ const Cards = ({data}) => {
   ;
 
   return (
-    <div className='flex flex-wrap justify-left'>
+    <div className='cardsContainer gridFallback'>
       {renderCards(data)}
     </div>
   )

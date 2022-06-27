@@ -15,28 +15,28 @@ import {PopupContext} from './DataVizContainer';
 
 export default function MediaCard({data}) {
   const [expanded, setExpanded] = useState(false);
-  const { toggleClosePopups, sendVenueId} = useContext(PopupContext);
+  const { toggleClosePopups, sendVenueId, popupVenueId} = useContext(PopupContext);
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
-  console.log('MediaCard data: ', data);
+  //console.log('MediaCard data: ', data);
 
   function getCardMediaImg(){
-    let width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-    let img = "";
-    if (width < 500) {
-      //recomendation
-      img = data.images.filter((img) => {
-        return img.url.includes("RECOMENDATION")
-      })
-    }
-    else{
-      //artist page
+    let img;
+    //let width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    // if (width < 200) {
+    //   //recomendation
+    //   img = data.images.filter((img) => {
+    //     return img.url.includes("RECOMENDATION")
+    //   })
+    // }
+
+      
       img = data.images.filter((img) => {
         return img.url.includes("ARTIST_PAGE")
       })
-    }
+    
     return img[0].url
   }
 
@@ -52,15 +52,19 @@ export default function MediaCard({data}) {
   }));
 
   function gotoMarker(id){
+    console.log("ID: ", id);
     toggleClosePopups();
+    if (id == popupVenueId){
+      sendVenueId(0)
+    }
     sendVenueId(id);
     document.querySelector(`#map`).scrollIntoView(false, {
       behavior: 'smooth'
     });
   }
-
+//250 xs 222
   return (
-    <Card sx={{ maxWidth: 302 }} id={`card-${data.id}`} >
+    <Card sx={{ boxShadow: 2 }} id={`card-${data.id}`} className={"card"} >
       <CardMedia
         component="img"
         height="140"
@@ -80,15 +84,15 @@ export default function MediaCard({data}) {
       
       <CardActions>
         <Button size="small" data-venueid={data.venueId} onClick={(e) => {gotoMarker(e.target.dataset.venueid)}}>Show on map</Button>
-        <Button size="small" onClick={(e) => {console.log(e)}}><a href={data.url} target='_blank' >Buy Tickets</a></Button>
-      <ExpandMore
+        <Button size="small" ><a href={data.url} target='_blank' >Buy Tickets</a></Button>
+      {/* <ExpandMore
           expand={expanded}
           onClick={handleExpandClick}
           aria-expanded={expanded}
           aria-label="show more"
         >
           <ExpandMoreIcon />
-        </ExpandMore>
+        </ExpandMore> */}
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>

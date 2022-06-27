@@ -1,0 +1,40 @@
+@include mediaXl {
+    //min-width: 1025px
+}
+
+@include mediaL {
+    //max-width: 1024px
+    .cardsContainer {
+        //flex flex-wrap justify-left grid-cols-4
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@include mediaM {
+    //max-width: 768px
+    .cardsContainer {
+        //flex flex-wrap justify-left grid-cols-4
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-items: center;
+    }
+}
+
+@include mediaS {
+    //max-width: 640px
+}
+
+@include mediaXs {
+    //max-width: 540px
+    .cardsContainer {
+        //flex flex-wrap justify-left grid-cols-4
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        justify-items: center;
+    }
+}
+
+@include mediaXXs {
+    //max-width: 376px
+    .card {
+        width: 222px;
+    }
+}

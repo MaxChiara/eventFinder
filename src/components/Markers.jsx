@@ -13,8 +13,8 @@ const Markers = ({data}) => {
   const markerRef = useRef();
   const map = useMap();
   const flyToZoom = 16;
-  
-  map.invalidateSize({debounceMoveend: true});
+  //const zOffset = 900;
+
 
   function setRef(popupVenueId, venueId){
     if (!popupVenueId){return null}
@@ -40,7 +40,20 @@ const Markers = ({data}) => {
         }
         else {tempCoordArray.push(`${venue.latlng.lat},${venue.latlng.lng}`)}
       return (  
-        <Marker  position={[venue.latlng.lat, venue.latlng.lng]} key={venue.id} alt={venue.id} ref={setRef(popupVenueId, venue.id)} >
+        <Marker  position={[venue.latlng.lat, venue.latlng.lng]} key={venue.id} alt={venue.id} ref={setRef(popupVenueId, venue.id)} 
+          riseOnHover={true} 
+          //zIndexOffset={0}
+          // eventHandlers={{
+          //   popupopen: (e) => {
+          //     //setZIndexOffset(zOffset);
+              
+          //     e.target._zIndex += zOffset;
+          //   },
+          //   popupclose: (e) => {
+          //     //setZIndexOffset(0);
+          //     e.target._zIndex -= zOffset;
+          //   }}} 
+        >
           <Popup >
            <EvenuePopup events={venue.events} name={venue.venueName} distance={venue.distance} />
            {/* <EvenuePopup events={venue.events} name={venue.venueName} /> */}
@@ -50,7 +63,6 @@ const Markers = ({data}) => {
     }))
   }
 
-
   useEffect(() => {
     if(status){
       map.stop();
@@ -59,13 +71,27 @@ const Markers = ({data}) => {
       map.flyTo([coordinates.lat, coordinates.lng], flyToZoom, {duration: 0.6, easeLinearity: 1});
       setTimeout(function(){ 
         gsap.from(`#${popupVenueId}`, {y:-100,duration:0.6, ease: "bounce.out"});
-      }, 600);
+      }, 700);
       setTimeout(function(){ 
-        markerRef.current.openPopup();
+        markerRef.current.openPopup(); 
       }, 900);
       toggleClosePopups();
     }
-  },[popupVenueId])
+  },) // non metto [popupVenueId] perchè voglio che venga rirenderizzato anche quando popupVenueId è lo stesso valore
+
+  if(status){
+    // map.stop();
+    // const coordinates = markerRef.current.getLatLng();
+    // map.closePopup();
+    // map.flyTo([coordinates.lat, coordinates.lng], flyToZoom, {duration: 0.6, easeLinearity: 1});
+    // setTimeout(function(){ 
+    //   gsap.from(`#${popupVenueId}`, {y:-100,duration:0.6, ease: "bounce.out"});
+    // }, 700);
+    // setTimeout(function(){ 
+    //   markerRef.current.openPopup(); 
+    // }, 900);
+    // toggleClosePopups();
+  }
 
  useEffect(() =>{
   document.querySelectorAll('img.leaflet-marker-icon').forEach((element) => {

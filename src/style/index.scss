@@ -3,5 +3,38 @@
 @tailwind components;
 @tailwind utilities;
 .leaflet-popup-content p {
-    margin: 8px 0;
+    margin: 0;
 }
+
+.gridFallback {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: space-around;
+}
+
+.cardsContainer {
+    //flex flex-wrap justify-left grid-cols-4
+    margin-top: 0.5rem;
+    display: grid;
+    grid-auto-columns: max-content;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.card {
+    width: 250px;
+}
+
+.heading {
+    text-align: center;
+    margin: 2rem auto;
+    h1 {
+        font-size: 2rem;
+    }
+    p {
+        text-align: center;
+    }
+}
+
+@import "responsiveness"

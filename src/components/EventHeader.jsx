@@ -16,13 +16,13 @@ function EventHeader({event, styleProp, onNameClick}){
 
     return(
     <div>
-        <Typography variant={style.mainTitle} component="div" onClick={onNameClick || null} className={onNameClick? 'hover:opacity-50 cursor-pointer' : ''} >
+        <Typography sx={{color:"#250f9b"}} variant={style.mainTitle} component="div" onClick={onNameClick || null} className={onNameClick? 'm-0 hover:opacity-50 cursor-pointer' : 'm-0'} >
             {event.name}
         </Typography>
-        <Typography variant={style.subtitle} >
+        <Typography variant={style.subtitle} className='mb-2' >
             {event.genre == "Undefined" ? "" : event.genre}
         </Typography>
-        <Typography sx={{ mb: 1.5 }} color="text.secondary">
+        <Typography sx={{ mt: 1.5 }} color="text.primary" className='mx-0 my-2' >
             Schedule:&nbsp;
             {event.time.map((time, index) => {
                 if (time) {

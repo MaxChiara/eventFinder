@@ -1,5 +1,7 @@
 {
-    "private": true,
+    "name": "event-finder",
+    "version": "1.0.0",
+    "description": "App for finding events in a certain area",
     "scripts": {
         "start": "webpack serve",
         "watch": "webpack --watch",
